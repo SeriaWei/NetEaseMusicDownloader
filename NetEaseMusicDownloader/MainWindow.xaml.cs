@@ -33,7 +33,10 @@ namespace NetEaseMusicDownloader
         private Regex _regex_Author = new Regex("data-res-author=\"(.+)\"", RegexOptions.Compiled);
 
         private Regex _regex_Album = new Regex("<meta +property=\"og:music:album\" content=\"(.+)\" ?/>", RegexOptions.Compiled);
-        private Regex _regex_Url = new Regex(@"https?://music.163.com/song\?id=(\d+)", RegexOptions.Compiled);
+        private Regex _regex_SongUrl = new Regex(@"https?://music.163.com/song\?id=(\d+)", RegexOptions.Compiled);
+        private Regex _regex_albumUrl = new Regex(@"https?://music.163.com/album\?id=(\d+)", RegexOptions.Compiled);
+        private Regex _regex_playlistUrl = new Regex(@"https?://music.163.com/playlist\?id=(\d+)", RegexOptions.Compiled);
+        private Regex _regex_SongId = new Regex(@"/song\?id=(\d+)", RegexOptions.Compiled);
         private char[] _authorSplitChars = new char[] { '/', '&', ';', ',' };
         private Task _downloadTask;
         private Task _getUrlTask;
@@ -55,9 +58,16 @@ namespace NetEaseMusicDownloader
                     this.Dispatcher.Invoke(() =>
                     {
                         string url = Clipboard.GetText();
-                        if (!string.IsNullOrEmpty(url) && _regex_Url.IsMatch(url))
+                        if (!string.IsNullOrEmpty(url) && (url.StartsWith("https://music.163.com/") || url.StartsWith("http://music.163.com/")))
                         {
-                            pendingTasks.Push(url);
+                            if (_regex_SongUrl.IsMatch(url))
+                            {
+                                pendingTasks.Push(url);
+                            }
+                            else if (_regex_albumUrl.IsMatch(url)|| _regex_playlistUrl.IsMatch(url))
+                            {
+                                GetSongs(url);
+                            }
                             Clipboard.Clear();
                         }
                     });
@@ -158,6 +168,30 @@ namespace NetEaseMusicDownloader
                     }
                 }
             });
+        }
+        private void GetSongs(string url)
+        {
+            this.Dispatcher.Invoke(new Action<string>(DisplayMessage), "正在播放列表/专辑的歌曲信息...");
+            using (WebClient webClient = new WebClient())
+            {
+                webClient.Headers["User-Agent"] = UserAgent;
+                string html = webClient.DownloadString(url);
+                HashSet<string> ids = new HashSet<string>();
+                _regex_SongId.Replace(html, evaluator =>
+                {
+                    string id = evaluator.Groups[1].Value;
+                    if (!ids.Contains(id))
+                    {
+                        ids.Add(id);
+                    }
+                    return string.Empty;
+                });
+                this.Dispatcher.Invoke(new Action<string>(DisplayMessage), $"解析到 {ids.Count} 首歌曲。");
+                foreach (var id in ids)
+                {
+                    pendingTasks.Push($"https://music.163.com/song?id={id}");
+                }
+            }
         }
         private MusicTag ParseMusicTag(string url)
         {
