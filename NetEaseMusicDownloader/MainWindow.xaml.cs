@@ -64,7 +64,7 @@ namespace NetEaseMusicDownloader
                             {
                                 pendingTasks.Push(url);
                             }
-                            else if (_regex_albumUrl.IsMatch(url)|| _regex_playlistUrl.IsMatch(url))
+                            else if (_regex_albumUrl.IsMatch(url) || _regex_playlistUrl.IsMatch(url))
                             {
                                 GetSongs(url);
                             }
@@ -171,7 +171,7 @@ namespace NetEaseMusicDownloader
         }
         private void GetSongs(string url)
         {
-            this.Dispatcher.Invoke(new Action<string>(DisplayMessage), "正在播放列表/专辑的歌曲信息...");
+            this.Dispatcher.Invoke(new Action<string>(DisplayMessage), "正在获取 播放列表/专辑 的歌曲信息...");
             using (WebClient webClient = new WebClient())
             {
                 webClient.Headers["User-Agent"] = UserAgent;
