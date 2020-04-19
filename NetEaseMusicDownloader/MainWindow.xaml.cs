@@ -171,7 +171,6 @@ namespace NetEaseMusicDownloader
                                         File.Delete(target);
                                     }
                                     File.Move(TempFile, target);
-                                    this.Dispatcher.Invoke(new Action(Reset));
                                 }
                             }
                         }
@@ -269,7 +268,6 @@ namespace NetEaseMusicDownloader
             AlbumFrontCovert.Source = bitImage;
             Label_Info.Content = "等待中...";
             ProgressBar_Download.Value = 0;
-            TextBox_Url.Text = string.Empty;
         }
         private void DisplaySongInfo(MusicTag tag)
         {
@@ -290,6 +288,7 @@ namespace NetEaseMusicDownloader
         private void SetUrl(string url)
         {
             TextBox_Url.Text = url;
+            ProgressBar_Download.Value = 0;
         }
     }
 }
