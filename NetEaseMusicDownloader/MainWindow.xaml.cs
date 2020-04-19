@@ -89,7 +89,8 @@ namespace NetEaseMusicDownloader
                     }
                     string musicUrl = pendingTasks.Pop();
                     MusicTag musicTag = ParseMusicTag(musicUrl);
-                    this.Dispatcher.Invoke(new Action<string>(DisplayMessage), $"正在下载：{musicTag.Author} - {musicTag.Title}.mp3");
+                    this.Dispatcher.Invoke(new Action<MusicTag>(DisplaySongInfo), musicTag);
+
                     string id = System.Web.HttpUtility.ParseQueryString(new Uri(musicUrl).Query)["id"];
                     WebRequest request = WebRequest.Create($"http://music.163.com/song/media/outer/url?id={id}.mp3");
                     request.Headers["User-Agent"] = UserAgent;
@@ -171,7 +172,6 @@ namespace NetEaseMusicDownloader
                                     }
                                     File.Move(TempFile, target);
                                     this.Dispatcher.Invoke(new Action(Reset));
-                                    this.Dispatcher.Invoke(new Action<string>(DisplayMessage), fileName + " 下载完成！");
                                 }
                             }
                         }
@@ -262,7 +262,26 @@ namespace NetEaseMusicDownloader
         }
         private void Reset()
         {
+            BitmapImage bitImage = new BitmapImage();
+            bitImage.BeginInit();
+            bitImage.UriSource = new Uri("/07.jpg", UriKind.Relative);
+            bitImage.EndInit();
+            AlbumFrontCovert.Source = bitImage;
+            Label_Info.Content = "等待中...";
             ProgressBar_Download.Value = 0;
+            TextBox_Url.Text = string.Empty;
+        }
+        private void DisplaySongInfo(MusicTag tag)
+        {
+            Label_Info.Content = "专辑：" + tag.Album + " " + tag.Author + " - " + tag.Title;
+            if (tag.AlbumImg != null)
+            {
+                BitmapImage bitImage = new BitmapImage();
+                bitImage.BeginInit();
+                bitImage.StreamSource = new MemoryStream(tag.AlbumImg);
+                bitImage.EndInit();
+                AlbumFrontCovert.Source = bitImage;
+            }
         }
         private void DisplayMessage(string message)
         {

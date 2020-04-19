@@ -8,7 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="07.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ID3" Version="0.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="07.jpg" />
   </ItemGroup>
 
 </Project>
