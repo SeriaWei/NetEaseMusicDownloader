@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ID3.Files-DotNetCore" Version="0.4.0.13" />
+    <PackageReference Include="ID3" Version="0.6.0" />
   </ItemGroup>
 
 </Project>

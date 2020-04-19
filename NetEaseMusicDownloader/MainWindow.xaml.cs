@@ -1,4 +1,5 @@
 ﻿using Id3;
+using Id3.Frames;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,6 +34,7 @@ namespace NetEaseMusicDownloader
         private Regex _regex_Author = new Regex("data-res-author=\"(.+)\"", RegexOptions.Compiled);
 
         private Regex _regex_Album = new Regex("<meta +property=\"og:music:album\" content=\"(.+)\" ?/>", RegexOptions.Compiled);
+        private Regex _regex_AlbumImage = new Regex("<meta +property=\"og:image\" content=\"(.+)\" ?/>", RegexOptions.Compiled);
         private Regex _regex_SongUrl = new Regex(@"https?://music.163.com/song\?id=(\d+)", RegexOptions.Compiled);
         private Regex _regex_albumUrl = new Regex(@"https?://music.163.com/album\?id=(\d+)", RegexOptions.Compiled);
         private Regex _regex_playlistUrl = new Regex(@"https?://music.163.com/playlist\?id=(\d+)", RegexOptions.Compiled);
@@ -115,12 +117,17 @@ namespace NetEaseMusicDownloader
                                         }
                                     }
                                     string fileName = $"{musicTag.Author} - {musicTag.Title}.mp3";
-                                    using (var mp3 = new Mp3File(TempFile, Mp3Permissions.ReadWrite))
+
+
+                                    using (var mp3 = new Mp3(TempFile, Mp3Permissions.ReadWrite))
                                     {
                                         try
                                         {
-
-                                            Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2x);
+                                            Id3Tag tag = mp3.GetTag(Id3TagFamily.Version2X);
+                                            if (tag == null)
+                                            {
+                                                tag = new Id3Tag();
+                                            }
                                             tag.Title.EncodingType = Id3TextEncoding.Unicode;
                                             tag.Artists.EncodingType = Id3TextEncoding.Unicode;
                                             tag.Album.EncodingType = Id3TextEncoding.Unicode;
@@ -131,13 +138,21 @@ namespace NetEaseMusicDownloader
                                                 tag.Artists.Value.Add(item.Trim());
                                             }
                                             tag.Album.Value = musicTag.Album;
-                                            mp3.WriteTag(tag);
+                                            if (musicTag.AlbumImg != null)
+                                            {
+                                                PictureFrame pictureFrame = new PictureFrame();
+                                                pictureFrame.PictureData = musicTag.AlbumImg;
+                                                pictureFrame.PictureType = PictureType.FrontCover;
+                                                tag.Pictures.Add(pictureFrame);
+                                            }
+                                            mp3.WriteTag(tag, Id3Version.V23, WriteConflictAction.Replace);
                                         }
                                         catch (Exception ex)
                                         {
                                             this.Dispatcher.Invoke(new Action<string>(DisplayMessage), ex.Message);
                                         }
                                     }
+
                                     fileName = fileName.Replace("\0", "");
                                     foreach (var item in System.IO.Path.GetInvalidFileNameChars())
                                     {
@@ -223,6 +238,14 @@ namespace NetEaseMusicDownloader
                     if (tag.Album == null)
                     {
                         tag.Album = HttpUtility.HtmlDecode(evaluator.Groups[1].Value.Trim());
+                    }
+                    return string.Empty;
+                });
+                _regex_AlbumImage.Replace(html, evaluator =>
+                {
+                    if (tag.AlbumImg == null)
+                    {
+                        tag.AlbumImg = webClient.DownloadData(HttpUtility.HtmlDecode(evaluator.Groups[1].Value.Trim() + "?param=130y130"));
                     }
                     return string.Empty;
                 });
