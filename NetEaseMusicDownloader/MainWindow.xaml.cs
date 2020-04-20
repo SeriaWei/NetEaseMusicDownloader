@@ -2,6 +2,7 @@
 using Id3.Frames;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -28,6 +29,7 @@ namespace NetEaseMusicDownloader
     {
         private const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36";
         private const string TempFile = "temp.buf";
+        private const string DownloadFoler = "Music";
         //private Regex _regex_Title = new Regex("<meta +property=\"og:title\" content=\"(.+)\" ?/>", RegexOptions.Compiled);
         //private Regex _regex_Author = new Regex("<meta +property=\"og:music:artist\" content=\"(.+)\" ?/>", RegexOptions.Compiled);
         private Regex _regex_Title = new Regex("data-res-name=\"(.+)\"", RegexOptions.Compiled);
@@ -159,7 +161,7 @@ namespace NetEaseMusicDownloader
                                     {
                                         fileName = fileName.Replace(item, '-');
                                     }
-                                    string dir = System.IO.Path.Combine("Music", musicTag.Author.Split(_authorSplitChars, StringSplitOptions.RemoveEmptyEntries)[0].Trim());
+                                    string dir = System.IO.Path.Combine(DownloadFoler, musicTag.Author.Split(_authorSplitChars, StringSplitOptions.RemoveEmptyEntries)[0].Trim());
                                     if (!Directory.Exists(dir))
                                     {
                                         Directory.CreateDirectory(dir);
@@ -293,6 +295,16 @@ namespace NetEaseMusicDownloader
         {
             TextBox_Url.Text = url;
             ProgressBar_Download.Value = 0;
+        }
+
+        private void Button_OpenFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(new System.Diagnostics.ProcessStartInfo()
+            {
+                FileName = System.IO.Path.Combine(Directory.GetCurrentDirectory(), DownloadFoler),
+                UseShellExecute = true,
+                Verb = "open"
+            });            
         }
     }
 }
