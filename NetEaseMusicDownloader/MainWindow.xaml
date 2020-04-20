@@ -9,9 +9,9 @@
     <Grid>
         <Label Content="歌曲地址" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="25" Width="134"/>
         <TextBox Margin="69,14,10,0" IsReadOnly="True" Text="" Name="TextBox_Url" TextWrapping="Wrap" VerticalAlignment="Top" Height="17"/>
-        <ProgressBar Name="ProgressBar_Download" Margin="104,85,10,0" Height="19" VerticalAlignment="Top"/>
-        <Label Content="等待中..." Name="Label_Info" Margin="104,40,10,0" VerticalAlignment="Top" Height="25"/>
-        <Image Name="AlbumFrontCovert" HorizontalAlignment="Left" Height="73" Margin="10,40,0,0" VerticalAlignment="Top" Width="73" Source="/07.jpg"/>
+        <ProgressBar Name="ProgressBar_Download" Margin="104,88,10,0" Height="19" VerticalAlignment="Top"/>
+        <Label Content="等待中..." Name="Label_Info" Margin="104,40,10,0" VerticalAlignment="Top" Height="38"/>
+        <Image Name="AlbumFrontCovert" HorizontalAlignment="Left" Height="73" Margin="16,42,0,0" VerticalAlignment="Top" Width="73" Source="/07.jpg"/>
 
     </Grid>
 </Window>

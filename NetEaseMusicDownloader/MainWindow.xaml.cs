@@ -171,6 +171,10 @@ namespace NetEaseMusicDownloader
                                         File.Delete(target);
                                     }
                                     File.Move(TempFile, target);
+                                    this.Dispatcher.Invoke(() =>
+                                    {
+                                        ProgressBar_Download.Value = 0;
+                                    });
                                 }
                             }
                         }
@@ -271,7 +275,7 @@ namespace NetEaseMusicDownloader
         }
         private void DisplaySongInfo(MusicTag tag)
         {
-            Label_Info.Content = "专辑：" + tag.Album + " " + tag.Author + " - " + tag.Title;
+            Label_Info.Content = "歌曲：" + tag.Author + " - " + tag.Title + "\r\n专辑：" + tag.Album;
             if (tag.AlbumImg != null)
             {
                 BitmapImage bitImage = new BitmapImage();
